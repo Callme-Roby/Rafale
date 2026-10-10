@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Rafale, club de disque</title>
+  <meta name="description" content="Un disque, deux joueurs, un but de chaque côté. Envoie le lien à un ami et jouez dans le navigateur.">
+  <meta name="theme-color" content="#2238E8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%232238E8'/%3E%3Ccircle cx='32' cy='32' r='22' fill='%23fff' stroke='%23000' stroke-width='4'/%3E%3Ccircle cx='32' cy='32' r='12' fill='none' stroke='%23FF4A2E' stroke-width='6'/%3E%3C/svg%3E">
+  <link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <canvas id="stage" aria-hidden="true"></canvas>
+
+  <!-- Accueil -->
+  <main id="home" class="screen">
+    <section class="hero">
+      <header class="hero-top">
+        <p class="brand">Rafale <span>club de disque</span></p>
+        <nav aria-label="Sur cette page">
+          <a href="#regles">Règles</a>
+          <a href="#vents">Les six vents</a>
+          <a href="#touches">Touches</a>
+          <button type="button" class="mute" data-mute aria-pressed="false">Couper le son</button>
+        </nav>
+      </header>
+      <h1 class="sr">Rafale</h1>
+      <p class="pitch">Un disque, deux joueurs, un but de chaque côté. Trente secondes par set.</p>
+      <div class="modes">
+        <button type="button" data-mode="host"><b>Inviter un ami</b><span>Crée la partie et envoie le lien.</span></button>
+        <button type="button" data-mode="solo"><b>Jouer contre l’ordi</b><span>Trois niveaux pour s’échauffer.</span></button>
+        <button type="button" data-mode="local"><b>À deux sur ce clavier</b><span>Un clavier, deux joueurs, côte à côte.</span></button>
+      </div>
+    </section>
+
+    <section id="regles" class="rules">
+      <h2>Trois façons de marquer</h2>
+      <div class="rules-grid">
+        <figure class="rules-fig" id="rules-fig"></figure>
+        <dl class="facts">
+          <div><dt>3 ou 5</dt><dd>Le disque entre dans le but adverse. La zone touchée donne les points.</dd></div>
+          <div><dt>2</dt><dd>Le disque tombe au sol dans le camp adverse après un lob.</dd></div>
+          <div><dt>12 pts, 30 s</dt><dd>Le set s’arrête à 12 points ou quand le chrono est à zéro. Le meilleur score le prend.</dd></div>
+          <div><dt>2 sets</dt><dd>Deux sets gagnés et le match est plié. Égalité parfaite : mort subite, le premier point gagne.</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section id="vents" class="winds">
+      <h2>Les six vents</h2>
+      <p class="lede">Deux rapides, deux équilibrés, deux puissants. Chaque affiche montre la trajectoire de leur tir spécial.</p>
+      <div class="wind-grid" id="wind-grid"></div>
+    </section>
+
+    <section id="touches" class="keys">
+      <h2>Les touches</h2>
+      <div class="keys-grid">
+        <table>
+          <caption class="sr">Touches selon le mode de jeu</caption>
+          <thead><tr><th scope="col"></th><th scope="col">Seul ou en ligne</th><th scope="col">À deux, joueur 1</th><th scope="col">À deux, joueur 2</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Se déplacer</th><td><kbd>Flèches</kbd> ou <kbd data-wasd>ZQSD</kbd></td><td><kbd data-wasd>ZQSD</kbd></td><td><kbd>Flèches</kbd></td></tr>
+            <tr><th scope="row">Tirer, glisser</th><td><kbd>Espace</kbd> <kbd>X</kbd> <kbd>J</kbd></td><td><kbd>F</kbd></td><td><kbd>K</kbd></td></tr>
+            <tr><th scope="row">Lober, contrer</th><td><kbd>C</kbd> <kbd>K</kbd> <kbd>Maj</kbd></td><td><kbd>G</kbd></td><td><kbd>L</kbd></td></tr>
+          </tbody>
+        </table>
+        <dl class="moves">
+          <div><dt>Tir</dt><dd>Une direction et le bouton de tir. Plus tu relâches vite après la réception, plus le disque part fort.</dd></div>
+          <div><dt>Effet</dt><dd>Fais un demi-cercle avec la direction juste avant de tirer : le disque courbe.</dd></div>
+          <div><dt>Glissade</dt><dd>Sans le disque, une direction et le bouton de tir pour plonger.</dd></div>
+          <div><dt>Lob</dt><dd>Le disque passe en cloche. S’il touche le sol en face, 2 points.</dd></div>
+          <div><dt>Contre</dt><dd>Sans le disque, bouton de lob juste avant de recevoir : le disque monte au-dessus de toi.</dd></div>
+          <div><dt>Tir spécial</dt><dd>Reste sous un disque qui retombe jusqu’à ce que le cercle soit plein, puis tire.</dd></div>
+        </dl>
+      </div>
+      <p class="small">Une manette fonctionne aussi. Sur téléphone, un stick et deux boutons apparaissent à l’écran.</p>
+    </section>
+
+    <footer class="foot">
+      <p class="brand">Rafale <span>club de disque</span></p>
+      <p>Petit jeu fait pour jouer entre amis. Personnages, noms et visuels originaux.</p>
+    </footer>
+  </main>
+
+  <!-- Choix des vents et du terrain -->
+  <section id="versus" class="screen" hidden>
+    <header class="vs-top">
+      <button type="button" class="text-btn" id="vs-back">Accueil</button>
+      <p id="vs-title"></p>
+      <button type="button" class="text-btn mute" data-mute aria-pressed="false">Couper le son</button>
+    </header>
+    <div class="vs-halves">
+      <div class="half" id="half0"></div>
+      <div class="half" id="half1"></div>
+    </div>
+    <div class="vs-bar">
+      <fieldset class="courts" id="courts"><legend>Terrain</legend><div class="court-row" id="court-row"></div></fieldset>
+      <fieldset class="levels" id="levels" hidden><legend>Niveau de l’ordi</legend><div class="level-row" id="level-row"></div></fieldset>
+      <div class="go-wrap">
+        <p class="go-note" id="go-note" role="status"></p>
+        <button type="button" class="go" id="go">Lancer la partie</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Match -->
+  <section id="match" class="screen" hidden>
+    <div class="hud" id="hud">
+      <div class="hud-p left"><span class="hud-name" id="n0"></span><span class="pips" id="pips0"></span></div>
+      <div class="hud-mid" aria-live="off">
+        <b id="sc0">00</b><span class="clock" id="clock">30</span><b id="sc1">00</b>
+      </div>
+      <div class="hud-p right"><span class="pips" id="pips1"></span><span class="hud-name" id="n1"></span></div>
+      <button type="button" class="hud-btn" id="pause-btn" aria-label="Menu">Menu</button>
+    </div>
+    <div class="call" id="call" aria-live="polite"><div class="call-in"><b id="call-main"></b><span id="call-sub"></span></div></div>
+    <p class="hint" id="hint"></p>
+    <div class="touch" id="touch" hidden>
+      <div class="stick" id="stick"><i id="knob"></i></div>
+      <div class="pads"><button type="button" id="tb" class="pad pad-b">Lob</button><button type="button" id="ta" class="pad pad-a">Tir</button></div>
+    </div>
+    <div class="sheet" id="pause" hidden>
+      <div class="sheet-in" role="dialog" aria-labelledby="pause-title">
+        <h2 id="pause-title">Pause</h2>
+        <div class="sheet-btns">
+          <button type="button" class="go" id="resume">Reprendre</button>
+          <button type="button" class="ghost" id="quit">Quitter la partie</button>
+        </div>
+      </div>
+    </div>
+    <div class="sheet result" id="result" hidden>
+      <div class="sheet-in" role="dialog" aria-labelledby="res-title">
+        <p class="res-kicker" id="res-kicker"></p>
+        <h2 id="res-title"></h2>
+        <p class="res-sets" id="res-sets"></p>
+        <div class="sheet-btns">
+          <button type="button" class="go" id="again">Rejouer</button>
+          <button type="button" class="ghost" id="change">Changer de vent ou de terrain</button>
+          <button type="button" class="ghost" id="res-home">Accueil</button>
+        </div>
+        <p class="res-note" id="res-note"></p>
+      </div>
+    </div>
+    <p class="rotate">Tourne ton téléphone : le terrain est en largeur.</p>
+  </section>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+
+  <script src="vendor/peerjs.min.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
