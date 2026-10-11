@@ -63,6 +63,8 @@ export function aiInput(s, id, m) {
   if (m.delay > 0) { m.delay -= DT; tx = me.x; ty = me.y; }
   else if (d.mode === 'lob') {
     if (mine(d.tx)) { tx = d.tx; ty = d.ty; } else { ty = s.H / 2; }
+  } else if (d.mode === 'spin') {
+    if (mine(d.x)) { tx = d.x; ty = d.y; eta = Math.max(0.01, d.T - d.t); } else { ty = s.H / 2; }
   } else if (d.mode === 'fly' && d.vx * fwd < 0) {
     const pr = predict(s, d, me.x);
     if (pr) {

@@ -51,6 +51,7 @@ export function play(evs) {
       case 'throw': noise(0.16, 900 + e.sp * 0.9, 2600, 0.26); if (e.perf) tone('square', 880, 1320, 0.07, 0.08); break;
       case 'lob': noise(0.3, 500, 1500, 0.2, 0.8); break;
       case 'catch': tone('sine', 190, 70, 0.11, 0.42); noise(0.05, 1800, 900, 0.16); if (e.ch) { tone('square', 440, 880, 0.14, 0.09); tone('square', 660, 1320, 0.16, 0.08, 0.08); } break;
+      case 'land': tone('sine', 220, 90, 0.14, 0.32); noise(0.9, 2400, 500, 0.1, 6); break;
       case 'pop': tone('triangle', 520, 1040, 0.12, 0.26); break;
       case 'wall': tone('square', 340, 220, 0.05, 0.1); break;
       case 'dash': noise(0.14, 300, 1300, 0.14, 0.7); break;

@@ -323,6 +323,7 @@ export class Renderer {
           this.shake = e.pts === 5 ? 16 : 10;
           break;
         }
+        case 'land': this.ring(e.x, e.y, 44, INK, 4); this.burst(e.x, e.y, CHALK, 6, 200); this.shake = 3; break;
         case 'miss':
           this.ring(e.x, e.y, 90, INK, 6); this.burst(e.x, e.y, INK, 10, 300);
           this.pops.push({ x: e.x, y: e.y - 30, text: '+' + e.pts, t: 0 });
@@ -406,6 +407,12 @@ export class Renderer {
       ctx.fillStyle = 'rgba(0,0,0,.18)';
       ctx.beginPath(); ctx.arc(d.tx, d.ty, DR * (0.5 + u * 0.6), 0, TAU); ctx.fill();
     }
+    // disque au sol : le cercle donne le temps qui reste pour le ramasser
+    if (d.mode === 'spin') {
+      const u = Math.min(1, d.t / d.T);
+      ctx.strokeStyle = CORAL; ctx.lineWidth = 6;
+      ctx.beginPath(); ctx.arc(d.x, d.y, DR + 17, -Math.PI / 2, -Math.PI / 2 + TAU * (1 - u)); ctx.stroke();
+    }
 
     // marqueurs au sol
     const cols = jerseys(s);
@@ -475,12 +482,21 @@ export class Renderer {
       const sc = 1 + d.z * 0.85;
       ctx.fillStyle = 'rgba(0,0,0,.28)';
       ctx.beginPath(); ctx.ellipse(d.x + 7 + d.z * 44, d.y + 9 + d.z * 62, DR * (1 + d.z * 0.2), DR * 0.9 * (1 + d.z * 0.2), 0, 0, TAU); ctx.fill();
+      const spin = d.mode === 'spin';
+      if (spin) {
+        // il vacille comme une pièce qui finit de tourner, de plus en plus vite
+        const u = Math.min(1, d.t / d.T);
+        ctx.save(); ctx.translate(d.x, dy); ctx.rotate(this.t * 7);
+        ctx.scale(0.55 + 0.45 * Math.abs(Math.cos(this.t * (12 + 30 * u))), 1);
+        ctx.translate(-d.x, -dy);
+      }
       ctx.fillStyle = CHALK; ctx.strokeStyle = INK; ctx.lineWidth = 2.5;
       ctx.beginPath(); ctx.arc(d.x, dy, DR * sc, 0, TAU); ctx.fill(); ctx.stroke();
       ctx.strokeStyle = CORAL; ctx.lineWidth = 3.5 * sc;
       ctx.beginPath(); ctx.arc(d.x, dy, DR * sc * 0.58, 0, TAU); ctx.stroke();
       ctx.fillStyle = INK;
       ctx.beginPath(); ctx.arc(d.x, dy, 2.2 * sc, 0, TAU); ctx.fill();
+      if (spin) ctx.restore();
     }
 
     // particules

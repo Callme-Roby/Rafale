@@ -12,6 +12,7 @@ export const RULES = {
   setPoints: 12,    // score qui termine le set
   setsToWin: 2,     // sets gagnants
   missPoints: 2,    // disque tombé au sol
+  groundTime: 1,    // secondes où le disque tourne au sol avant de compter
 };
 
 // vitesse du disque : 1 = réglage d'origine, plus petit = plus lent

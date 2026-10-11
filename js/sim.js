@@ -8,6 +8,7 @@ export const PR = 26;      // rayon d'un joueur
 export const DR = 13;      // rayon du disque
 export const GOAL_DEPTH = 56;
 const NET_GAP = 34;        // distance minimale au filet
+const REACH = 10;          // marge de réception autour du joueur : plus grand = plus facile
 const EDGE = 6;
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
@@ -25,6 +26,9 @@ function mkPlayer(side, ch) {
 }
 
 function setAnim(p, a) { if (p.anim !== a) { p.anim = a; p.animT = 0; } }
+
+// distance à laquelle un joueur attrape le disque, un peu plus en plongeant
+function reach(p) { return PR + DR + REACH + (p.dashT > 0 ? 6 : 0); }
 
 export function newMatch(cfg) {
   const c = courtById(cfg.court);
@@ -404,15 +408,28 @@ function updateDisc(s, dt) {
       if (dist < 42 && p.dashT <= 0 && !p.has) p.underT += dt; else p.underT = 0;
       if (u >= 1) {
         d.z = 0;
-        if (dist < PR + DR + 12 && p.kbT <= 0) {
+        if (dist < reach(p) && p.kbT <= 0) {
           const charged = p.underT >= 0.32;
           give(s, p, false);
           p.charged = charged;
           s.ev.push({ k: 'catch', by: p.side, sp: 0, sup: 0, ch: charged ? 1 : 0 });
         } else {
+          // manqué : le disque tourne au sol, il reste un instant pour le ramasser
           s.players[0].underT = 0; s.players[1].underT = 0;
-          addPoints(s, 1 - side, RULES.missPoints, { k: 'miss', side, pts: RULES.missPoints, x: d.tx, y: d.ty });
+          d.mode = 'spin'; d.t = 0; d.T = RULES.groundTime; d.x = d.tx; d.y = d.ty;
+          s.ev.push({ k: 'land', x: Math.round(d.x), y: Math.round(d.y) });
         }
+      }
+      break;
+    }
+    case 'spin': {
+      d.t += dt;
+      const side = d.x < s.W / 2 ? 0 : 1, p = s.players[side];
+      if (!p.has && p.kbT <= 0 && Math.hypot(p.x - d.x, p.y - d.y) < reach(p)) {
+        give(s, p, false);
+        s.ev.push({ k: 'catch', by: p.side, sp: 0, sup: 0 });
+      } else if (d.t >= d.T) {
+        addPoints(s, 1 - side, RULES.missPoints, { k: 'miss', side, pts: RULES.missPoints, x: d.x, y: d.y });
       }
       break;
     }
@@ -453,8 +470,7 @@ function tryCatch(s, d) {
   for (const p of s.players) {
     if (p.has || p.kbT > 0) continue;
     if (d.last === p.side && !d.reb) continue;
-    const r = PR + DR + (p.dashT > 0 ? 8 : 2);
-    if (Math.hypot(p.x - d.x, p.y - d.y) > r) continue;
+    if (Math.hypot(p.x - d.x, p.y - d.y) > reach(p)) continue;
     if (p.lockT > 0 && p.guardT <= 0 && p.dashT <= 0) continue;   // en récupération : le disque passe
     const fwd = p.side === 0 ? 1 : -1;
     const sup = d.mode === 'super';
