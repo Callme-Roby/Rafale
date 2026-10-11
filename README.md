@@ -40,7 +40,7 @@ Pour utiliser son propre serveur PeerJS : ajouter `?signal=hôte:port` à l'adre
 
 | Fichier | Contenu |
 | --- | --- |
-| `js/data.js` | Les six vents (stats, couleurs, textes), les cinq terrains (taille, zones, couleurs), les règles (30 s, 12 points) |
+| `js/data.js` | Les six vents (stats, couleurs, textes), les cinq terrains (taille, zones, couleurs), les règles (30 s, 12 points), la vitesse du disque (`PACE`) |
 | `js/sim.js` | Le moteur : déplacements, tirs, effets, lobs, contres, tirs spéciaux, score, sets |
 | `js/ai.js` | L'ordi et ses trois niveaux |
 | `js/render.js` | Le dessin du terrain, des joueurs, du disque et des effets |

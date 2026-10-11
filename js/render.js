@@ -1,11 +1,12 @@
 // Rafale — rendu : le terrain vu du ciel, ombres dures, aplats de couleur.
 
-import { charById, courtById, SUN, CORAL, INK, CHALK } from './data.js';
+import { charById, courtById, COURTS, PACE, SUN, CORAL, INK, CHALK } from './data.js';
 import { PR, DR, GOAL_DEPTH } from './sim.js';
 
 const FONT = (px, stretch = 'extra-condensed') => `900 ${stretch} ${px}px Archivo, "Arial Narrow", sans-serif`;
 const TAU = Math.PI * 2;
 const SHX = 13, SHY = 18;        // direction du soleil
+const MAXW = Math.max(...COURTS.map((c) => c.w)), MAXH = Math.max(...COURTS.map((c) => c.h));
 
 function hexToRgb(h) {
   const n = parseInt(h.slice(1), 16);
@@ -197,7 +198,7 @@ export function drawCourtThumb(canvas, court) {
   canvas.width = cw * dpr; canvas.height = ch * dpr;
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = court.look.apron; ctx.fillRect(0, 0, canvas.width, canvas.height);
-  const bw = 1040 + GOAL_DEPTH * 2 + 70, bh = 560 + 70;       // même échelle pour tous : on voit les tailles
+  const bw = MAXW + GOAL_DEPTH * 2 + 70, bh = MAXH + 70;       // même échelle pour tous : on voit les tailles
   const k = Math.min(canvas.width / bw, canvas.height / bh);
   ctx.translate(canvas.width / 2, canvas.height / 2); ctx.scale(k, k); ctx.translate(-court.w / 2, -court.h / 2);
   drawSurface(ctx, court); drawLines(ctx, court); drawGoals(ctx, court, null); drawWalls(ctx, court); drawNet(ctx, court);
@@ -306,7 +307,7 @@ export class Renderer {
       switch (e.k) {
         case 'catch':
           this.ring(d.x, d.y, e.sup ? 70 : 34 + Math.min(30, e.sp / 40), CHALK, e.sup ? 7 : 4);
-          if (e.sup) this.shake = 12; else if (e.sp > 1000) this.shake = 5;
+          if (e.sup) this.shake = 12; else if (e.sp > 1000 * PACE) this.shake = 5;
           if (e.ch) this.ring(d.x, d.y, 80, SUN, 8);
           break;
         case 'pop': this.ring(d.x, d.y, 50, CHALK, 5); this.burst(d.x, d.y, CHALK, 8, 260); break;

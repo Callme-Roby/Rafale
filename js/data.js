@@ -14,6 +14,9 @@ export const RULES = {
   missPoints: 2,    // disque tombé au sol
 };
 
+// vitesse du disque : 1 = réglage d'origine, plus petit = plus lent
+export const PACE = 0.82;
+
 // vitesse / puissance sur 5. Deux rapides, deux équilibrés, deux puissants.
 export const CHARS = [
   {
@@ -60,42 +63,42 @@ export function stats(c) {
   return {
     move: 290 + c.speed * 23,        // unités / s
     dash: 720 + c.speed * 48,
-    tmin: 500 + c.power * 22,        // tir mou (disque gardé trop longtemps)
-    tmax: 980 + c.power * 52,        // tir franc
+    tmin: (500 + c.power * 22) * PACE,   // tir mou (disque gardé trop longtemps)
+    tmax: (980 + c.power * 52) * PACE,   // tir franc
     res: 0.12 + c.power * 0.12,      // résistance au recul
-    sup: 960 + c.power * 46,         // vitesse de base du tir spécial
+    sup: (960 + c.power * 46) * PACE,    // vitesse de base du tir spécial
   };
 }
 
 // zones : [part de la hauteur, points], du haut vers le bas.
 export const COURTS = [
   {
-    id: 'plage', name: 'Plage', w: 880, h: 440,
+    id: 'plage', name: 'Plage', w: 790, h: 400,
     blurb: 'Petit terrain, échanges courts.',
     zones: [[0.35, 3], [0.30, 5], [0.35, 3]],
     look: { apron: '#F6E2B3', surface: '#EEC57A', alt: '#E9BC6C', line: '#2238E8', paint: 'rgba(255,255,255,.34)', pattern: 'dunes', net: '#2238E8' },
   },
   {
-    id: 'gazon', name: 'Gazon', w: 960, h: 500,
+    id: 'gazon', name: 'Gazon', w: 860, h: 450,
     blurb: 'Le classique. Le 5 est au centre.',
     zones: [[0.38, 3], [0.24, 5], [0.38, 3]],
     look: { apron: '#0C6B3B', surface: '#1E9F57', alt: '#23AD60', line: '#FFFFFF', paint: 'rgba(255,255,255,.16)', pattern: 'stripes', net: '#FFFFFF' },
   },
   {
-    id: 'dalles', name: 'Dalles', w: 960, h: 500,
+    id: 'dalles', name: 'Dalles', w: 860, h: 450,
     blurb: 'Les 5 points sont dans les coins.',
     zones: [[0.2, 5], [0.6, 3], [0.2, 5]],
     look: { apron: '#0B5F5C', surface: '#F0A49B', alt: '#EC978D', line: '#FFFFFF', paint: 'rgba(255,255,255,.3)', pattern: 'checker', net: '#FFFFFF' },
   },
   {
-    id: 'beton', name: 'Béton', w: 1040, h: 540,
+    id: 'beton', name: 'Béton', w: 940, h: 490,
     blurb: 'Deux plots sur la ligne du filet.',
     zones: [[0.37, 3], [0.26, 5], [0.37, 3]],
     posts: [0.25, 0.75],
     look: { apron: '#7C8085', surface: '#B9BCBF', alt: '#B0B3B7', line: '#FFC928', paint: 'rgba(0,0,0,.09)', pattern: 'speckle', net: '#FFC928' },
   },
   {
-    id: 'stade', name: 'Stade', w: 1040, h: 560,
+    id: 'stade', name: 'Stade', w: 940, h: 500,
     blurb: 'Grand terrain, cinq zones.',
     zones: [[0.13, 5], [0.30, 3], [0.14, 5], [0.30, 3], [0.13, 5]],
     look: { apron: '#FF4A2E', surface: '#2238E8', alt: '#2640F2', line: '#FFFFFF', paint: 'rgba(255,255,255,.13)', pattern: 'plain', net: '#FFFFFF' },

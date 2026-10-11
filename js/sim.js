@@ -1,7 +1,7 @@
 // Rafale — simulation. Pas de DOM ici : l'hôte fait tourner ce fichier,
 // l'invité ne fait qu'afficher les états qu'il reçoit.
 
-import { charById, courtById, stats, RULES } from './data.js';
+import { charById, courtById, stats, RULES, PACE } from './data.js';
 
 export const DT = 1 / 60;
 export const PR = 26;      // rayon d'un joueur
@@ -380,7 +380,7 @@ function updateDisc(s, dt) {
         const vx = d.vx * c - d.vy * sn, vy = d.vx * sn + d.vy * c;
         d.vx = vx; d.vy = vy; d.cleft -= Math.abs(da);
       }
-      if (Math.abs(d.vx) < 170) d.vx = (d.vx < 0 ? -1 : d.vx > 0 ? 1 : (d.last === 0 ? 1 : -1)) * 170;
+      if (Math.abs(d.vx) < 170 * PACE) d.vx = (d.vx < 0 ? -1 : d.vx > 0 ? 1 : (d.last === 0 ? 1 : -1)) * 170 * PACE;
       d.x += d.vx * dt; d.y += d.vy * dt;
       walls(s, d, true);
       posts(s, d);
@@ -478,9 +478,9 @@ function tryCatch(s, d) {
     const dirx = d.vx === 0 ? -fwd : Math.sign(d.vx);
     give(s, p, false);
     p.kbT = sup ? 0.2 : 0.12;
-    const dist = (sup ? 150 : clamp((sp - 600) / 700, 0, 1) * 58) * (1 - st.res);
+    const dist = (sup ? 150 : clamp((sp - 600 * PACE) / (700 * PACE), 0, 1) * 58) * (1 - st.res);
     p.kbv = (dirx * dist) / p.kbT; p.kbSup = sup;
-    s.freeze = sup ? 5 : sp > 1050 ? 2 : 0;
+    s.freeze = sup ? 5 : sp > 1050 * PACE ? 2 : 0;
     s.ev.push({ k: 'catch', by: p.side, sp: Math.round(sp), sup: sup ? 1 : 0 });
     return;
   }

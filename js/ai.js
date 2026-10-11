@@ -1,7 +1,7 @@
 // Rafale — l'ordi. Il produit les mêmes entrées qu'un joueur : direction + deux boutons.
 
 import { DT, DR } from './sim.js';
-import { charById, stats } from './data.js';
+import { charById, stats, PACE } from './data.js';
 
 const LV = [
   { react: 0.30, err: 74, hold: [0.38, 0.85], dash: 0.3, guard: 0.0, lob: 0.10 },
@@ -68,7 +68,7 @@ export function aiInput(s, id, m) {
     if (pr) {
       tx = me.x + (homeX - me.x) * 0.2; ty = pr.y + m.err; eta = pr.t;
       const sp = Math.hypot(d.vx, d.vy);
-      if (m.guard && sp < 1000 && pr.t < 0.1 && pr.t > 0.02 && Math.abs(me.y - pr.y) < 24 && me.lockT <= 0 && me.guardT <= 0 && me.dashT <= 0) {
+      if (m.guard && sp < 1000 * PACE && pr.t < 0.1 && pr.t > 0.02 && Math.abs(me.y - pr.y) < 24 && me.lockT <= 0 && me.guardT <= 0 && me.dashT <= 0) {
         m.guard = false; out.bc = ++m.bc; return out;
       }
     }
